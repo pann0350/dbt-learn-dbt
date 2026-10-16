@@ -1,0 +1,86 @@
+version: 2
+
+models:
+  - name: stg_drivers
+    description: "Staged Formula 1 driver records from f1.raw_drivers, with identifiers derived from driver URLs."
+    columns:
+      - name: driver_id
+        description: "Lowercase driver identifier extracted from the driver URL."
+        data_tests:
+          - not_null
+          - unique
+      - name: driver_slug
+        description: "Lowercase URL slug identifying the driver."
+      - name: driver_first_name
+        description: "Driver's first name."
+      - name: driver_last_name
+        description: "Driver's last name."
+      - name: driver_short_name
+        description: "Abbreviated driver name or code."
+      - name: driver_nationality
+        description: "Driver's nationality as recorded in the source."
+      - name: team_id
+        description: "Lowercase team identifier extracted from the team URL."
+        data_tests:
+          - not_null
+      - name: team
+        description: "Team name as recorded on the driver source row."
+
+  - name: stg_races
+    description: "Staged Grand Prix race and winner information from f1.raw_races."
+    columns:
+      - name: race_id
+        description: "Integer race identifier extracted from the race URL."
+        data_tests:
+          - not_null
+          - unique
+      - name: race_date
+        description: "Race date parsed from the source date and year fields. This column is named to_date because the SQL expression has no alias."
+      - name: year
+        description: "Season year from the source."
+      - name: grand_prix
+        description: "Grand Prix display name."
+      - name: grand_prix_slug
+        description: "Lowercase Grand Prix slug extracted from the race URL."
+      - name: winner_driver_first_name
+        description: "Winning driver's first name."
+      - name: winner_driver_last_name
+        description: "Winning driver's last name."
+      - name: winner_driver_short_name
+        description: "Winning driver's abbreviated name or code."
+      - name: winner_team_name
+        description: "Team credited with the race win."
+      - name: laps
+        description: "Winning driver's lap count, or null if the source value is nonnumeric."
+      - name: winner_time
+        description: "Winning time as provided in the source."
+
+  - name: stg_results
+    description: "Staged driver finishing results per Grand Prix from f1.raw_results."
+    columns:
+      - name: race_id
+        description: "Integer race identifier derived from the source URL."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_races')
+                field: race_id
+      - name: grand_prix_slug
+        description: "Lowercase Grand Prix slug extracted from the source URL."
+      - name: pos
+        description: "Numeric finishing position; null for nonnumeric position labels."
+      - name: "no"
+        description: "Car number, or null if the source value is nonnumeric."
+      - name: driver_first_name
+        description: "Driver's first name."
+      - name: driver_last_name
+        description: "Driver's last name."
+      - name: driver_short_name
+        description: "Driver's abbreviated name or code."
+      - name: team_name
+        description: "Team represented by the driver in this result."
+      - name: laps
+        description: "Laps completed, or null for nonnumeric values."
+      - name: pts
+        description: "Points awarded, stored as numeric; empty source strings become null."
