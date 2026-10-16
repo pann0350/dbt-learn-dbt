@@ -1,0 +1,49 @@
+version: 2
+
+models:
+  - name: dim_drivers
+    description: "One row per Formula 1 driver, based on stg_drivers. Incremental updates use driver_id."
+    columns:
+      - name: driver_id
+        description: "Driver identifier derived from the source URL; dimension key."
+        data_tests:
+          - not_null
+          - unique
+      - name: driver_slug
+        description: "Lowercase driver URL slug."
+      - name: driver_first_name
+        description: "Driver's first name."
+      - name: driver_last_name
+        description: "Driver's last name."
+      - name: driver_short_name
+        description: "Driver's abbreviated name or code."
+      - name: driver_nationality
+        description: "Driver's source nationality."
+
+  - name: dim_teams
+    description: "One row per team identifier. Repeated team rows in stg_teams are collapsed by team_id."
+    columns:
+      - name: team_id
+        description: "Team identifier derived from the source team URL; dimension key."
+        data_tests:
+          - not_null
+          - unique
+      - name: team_name
+        description: "Representative team name. Uses the minimum alphabetical name if source rows disagree."
+
+  - name: dim_races
+    description: "One row per race, with season and Grand Prix identifiers."
+    columns:
+      - name: race_id
+        description: "Integer race identifier derived from the source URL; dimension key."
+        data_tests:
+          - not_null
+          - unique
+      - name: season_year
+        description: "Formula 1 season year, renamed from the source year column."
+      - name: grand_prix
+        description: "Grand Prix display name."
+      - name: grand_prix_slug
+        description: "Lowercase Grand Prix URL slug."
+      - name: race_date
+        description: "Race date parsed from the source date and year fields."
